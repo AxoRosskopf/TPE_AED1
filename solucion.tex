@@ -4,23 +4,25 @@
 \newcommand{\tab}{~ \qquad}
 \input{Algo1Macros}
 \usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
+\usepackage{xcolor}
+
 
 \begin{document}
 
 \titulo{TP de Especificación}
-\subtitulo{AGREGAR TITULO TPE}
-\fecha{30 de Marzo de 2022}
+\subtitulo{}
+\fecha{23 de septiembre de 2022}
 \materia{Algoritmos y Estructuras de Datos I}
-\grupo{Grupo XX}
+\grupo{Grupo martinlau}
 
 \newcommand{\dato}{\textit{Dato}}
 \newcommand{\individuo}{\textit{Individuo}}
 
 % Pongan cuantos integrantes quieran
-\integrante{Wazowski, Mike}{002/12}{mwazowski@dc.uba.ar}
-\integrante{Bond, James}{007/007}{bond@mi6.co.uk}
-\integrante{Capunta, Elsa}{003/17}{ecapunta@dc.uba.ar}
-\integrante{Sánchez, Warren}{004/15}{tienelasrespuestas@les.luthier.com}
+\integrante{Apellidos, Lautaro}{370/22}{lautisantil@gmail.com }
+\integrante{Apellidos, Sofía}{1654/21 }{sofiapotter07@gmail.com }
+\integrante{Apellidos, Axel}{258/22}{a.i.cpvd3000@gmail.com }
+\integrante{Menalled, Martín}{339/11}{martinmenalled@gmail.com}
 
 \maketitle
 
@@ -31,42 +33,24 @@
 	\item type \individuo = $\TLista{\dato}$
 \end{description}
 
+{\color{red}FALTA ARMAR ESTO}
+
 \section{Constantes}
 	\aux{MIN}{}{\ent}{1}
 	\aux{MAX}{}{\ent}{10}
 
-
+{\color{red}??? ESTO?? QuE PONEMOS ACA?}
 
 \section{Problemas}
-\subsection{Ejercicio 1}
+\subsection*{Parte 1: Juego Básico}
+\subsection*{Ejercicio 1}
 
-\begin{proc}{unProblema}{\In t: \dato, \Inout result: $\bool$}{}
-    \pre{\True}
-    \post{result = \True \leftrightarrow predicadoPrincipal(t)}
-    
-    \pred{predicadoPrincipal}{d:\dato}{
-    	pred1(d) \y pred2(d)
-    }
-    
-    \pred{pred1}{d:\dato} {...}
-    \pred{pred2}{d:\dato} {...}
-\end{proc}
+\aux{minasAdyacentes}{t:tablero, p: pos}{\ent}{\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1} \IfThenElse{esAdyacente(convierteDosEnterosEnUnaPos (i, j), p) \wedge t[i][j]}{1}{0}} 
+{\color{red} estaba mal como pasabamos la posici[on del tablero porque asi como estaba era un bool. Armé una aux que le damos la i y la j y nos arme una tupla pos, revisen si esta ok.}
 
 
+\pred{esAdyacente}{X: pos,  P:pos}{(\longitud{X_0-P_0}=1 \wedge (\longitud{X_1-P_1}=1  \vee x_1=p_1 ) \bigvee (X_0=P_0 \wedge \longitud{X_1-P_1}=1 )}
 
-
-\subsection{Ejercicio 2}
-\begin{proc}{otroProblema}{\In i: \individuo, \Inout result: $\bool$}{}
-	\pre{|i| > MIN()}
-	\post{result = \True \leftrightarrow predicadoPrincipal2(i)}
-	
-	\pred{predicadoPrincipal2}{i:\individuo}{ 
-		pred1(i) \y \neg pred3(i)
-	}
-	
-	\pred{pred3}{i:\individuo} {...}
-\end{proc}
-
-
+\aux{convierteDosEnterosEnUnaPos}{x: \ent, y:\ent}{pos}{(x,y)}{}
 
 \end{document}
