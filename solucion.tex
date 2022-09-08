@@ -31,16 +31,18 @@
 \section{Definición de Tipos}
 
 \begin{description}
-    \item type \pos
-    \item type \tablero
-    \item type \jugadas
-    \item type \banderitas
+    \item type {\pos = $\ent \times \ent$}
+    \item type {\tablero = {\matriz {\bool}}}
+    \item type {\jugadas = {\TLista{\pos \times \ent}}}
+    \item type {\banderitas = \TLista{\pos}}
     
 \end{description}
 
 \section{Constantes}
 
 % AUXILIARES USADOS 
+
+\aux{cantidadDeMinasJugadas}{t:tablero, j:jugadas}{\ent}{\sum_{i=0}^{|j|-1} {\IfThenElse{(t[(j[i]_0)_0][j[i]_0)_1] = true}{1}{0}}}
 
 \aux{cantidadDeMinasTablero}{ t : \tablero}{\ent}{\sum_{i = 0}^{|t|-1}\sum_{j = 0}^{|t|- 1} 
     $if (t[i][j] = \True ) then 1 else 0 $ fi}
@@ -49,10 +51,12 @@
 
 % PREDICADOS USADOS
 
-\pred{esAdyacente}{X: \pos,  P:\pos}{(\longitud{X_0-P_0}=1 \wedge (\longitud{X_1-P_1}=1  \vee x_1=p_1 ) \bigvee (X_0=P_0 \wedge \longitud{X_1-P_1}=1 )}
+\pred{esAdyacente}{X: \pos,  P:\pos}{(\longitud{X_0-P_0}=1 \wedge (\longitud{X_1-P_1}=1  \vee X_1=P_1 ) \bigvee (X_0=P_0 \wedge \longitud{X_1-P_1}=1 )}
 
+\pred{posicionEsValida}{t: tablero, p: pos}{p_0 \leq \longitud{t} \y p_1 \leq \longitud{t}}{}
 
-\pred{juegoValido}{ t : \tablero , j : \jugadas}{}{}
+\pred{repiteJugada}{j:jugadas}{	(\forall i : \ent)( (0 \leq i < |j|) \implicaLuego (\exists k: \ent) ((0 \leq k \leq |j|)
+    \y (i\neq k)) \yLuego ((j[i]_0)_0 = (j[k]_0)_0 \y (j[i]_0)_1 = (j[k]_0)_1 )}{}
 
 \pred{predPerdio}{t : \tablero, j : \jugadas}{
    		cantidadDeMinas( t , j) = 1
@@ -70,14 +74,19 @@
 
 \subsection*{Ejercicio 1}
 
-\aux{minasAdyacentes}{t:\tablero, p: \pos}{\ent}{\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1} \IfThenElse{esAdyacente(convierteDosEnterosEnUnaPos (i, j), p) \wedge t[i][j]}{1}{0}} 
+\aux{minasAdyacentes}{t:\tablero, p: \pos}{\ent}{$$\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1$} \IfThenElse{esAdyacente(convierteDosEnterosEnUnaPos (i, j), p) \wedge t[i][j]=true}{1}{0}} 
 {\color{red} estaba mal como pasabamos la posici[on del tablero porque asi como estaba era un bool. Armé una aux que le damos la i y la j y nos arme una tupla pos, revisen si esta ok.}
 
 
 {\color{blue} Mas o menos entendi lo que hiciste, se me hace raro que de un numero(i , j)le pasas a una tupla para que luego agarres de nuevo estos  mismos numeros que ahora estan en tupla y los compares con pos, no terminas por hacer un paso de mas?? porque valdria esto por ejemplo 
 $|i - p_{0}| = 1$}
 
-\subsection{Ejercicio 4}
+{\color{red} Si, lo pensé igual que vos en un primer momento y lo había hecho así pero luego miré que más adelante usamos la misma auxiliar y le pasamos dos posiciones, entonces o había que hacer esto o hacer dos  "esAdyacente" y que una reciba dos posiciones y la otra reciba dos enteros y una posicion. Se me hizo que esta tal vez la reutilicemos}
+
+\subsection*{Ejercicio 2}
+\pred{juegoValido}{t: tablero, j: jugadas}{(\forall i : \ent)( (0 \leq i < |j|) $\implicaLuego$ (posicionEsValida(j[i]_0) \bigwedge ($j[i]_1$ = minasAdyacentes (t, j[0]_0)) \bigwedge  $\neg$ repiteJugada(j) \bigwedge \\($0\leq cantidadDeMinas(t, j) \leq 1)$)} {}
+
+\subsection*{Ejercicio 4}
 
 \begin{proc}{perdio}{\In i: \tablero, \In j: \jugadas, \Out res: \bool}{}
 	\pre{  juegoValido(t , j) \y tableroValido(t) }
@@ -86,14 +95,14 @@ $|i - p_{0}| = 1$}
 
 
 
-\subsection{Ejercicio 5}
+\subsection*{Ejercicio 5}
 \begin{proc}{gano}{\In i: \tablero, \In j: \jugadas, \Out res: \bool}{}
 	\pre{  juegoValido(t , j) \y tableroValido(t) \y predPerdio(t , j) }
     \post{ res : \True \leftrightarrow predGano(t , j)}
 \end{proc}
 
 
-\subsection{Ejercicio 6}
+\subsection*{Ejercicio 6}
 \begin{proc}{jugar}{\In t : \tablero , \In b : \banderitas, \In p : \pos , \Inout j : \jugadas}{}
     \pre { tableroValido(t) \y juegoValido(t , j) \y \neg predPerdio(t , j) \y \neg predGano(t , j) \y \neg posEnJugadas(p , j) \\ \y \neg posEnBanderitas(p , b) \y j = j_{0}}
     \post{(\forall i : \ent)(0 \leq i < |j_{0}|) \implicaLuego((j_{o}[i] \in j) \y ((\exists k : \ent)(0 \leq k < |j|) \yLuego (j[k][0]_{0} = p_{0} \y j[k][0]_{1} = p_{1} \y j[k][1] = minasAdyacentes(t , j))))}
@@ -105,7 +114,7 @@ $|i - p_{0}| = 1$}
 
 \subsection*{Parte 2: Despejar los vacıos}
 
-\subsection{Ejercicio 7}
+\subsection*{Ejercicio 7}
 
 
 \pred{caminoLibre}{t : \tablero,p_{0} : \pos ,p_{1} : \pos}{ tableroValido(t) \y posicionValida(p_{0}) \y posicionValida(p_{1})\y ((\exists s : \TLista{\pos})((\forall i : \ent)(0 \leq i < |s|-1)\implicaLuego (minasAdyacentes(t, s[1]) = 0 \y esAdyacente(s[i] ,s[i+1])) \yLuego p_{0} = s[0] \y p_{1} = s[|s| - 1]))}
