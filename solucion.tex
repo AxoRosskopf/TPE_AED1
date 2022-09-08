@@ -4,53 +4,111 @@
 \newcommand{\tab}{~ \qquad}
 \input{Algo1Macros}
 \usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
-\usepackage{xcolor}
-
 
 \begin{document}
 
-\titulo{TP de Especificación}
-\subtitulo{}
+\titulo{Trabajo Practico de Especificación}
+\subtitulo{Buscaminas}
 \fecha{23 de septiembre de 2022}
 \materia{Algoritmos y Estructuras de Datos I}
 \grupo{Grupo martinlau}
 
-\newcommand{\dato}{\textit{Dato}}
-\newcommand{\individuo}{\textit{Individuo}}
+\newcommand{\pos}{pos}
+\newcommand{\tablero}{tablero}
+\newcommand{\jugadas}{jugadas}
+\newcommand{\banderitas}{banderitas}
+
 
 % Pongan cuantos integrantes quieran
 \integrante{Apellidos, Lautaro}{370/22}{lautisantil@gmail.com }
 \integrante{Apellidos, Sofía}{1654/21 }{sofiapotter07@gmail.com }
-\integrante{Apellidos, Axel}{258/22}{a.i.cpvd3000@gmail.com }
+\integrante{Campoverde, Axel}{258/22}{a.i.cpvd3000@gmail.com }
 \integrante{Menalled, Martín}{339/11}{martinmenalled@gmail.com}
 
 \maketitle
 
 
 \section{Definición de Tipos}
+
 \begin{description}
-	\item type \dato = \ent \hspace{1cm}
-	\item type \individuo = $\TLista{\dato}$
+    \item type \pos
+    \item type \tablero
+    \item type \jugadas
+    \item type \banderitas
+    
 \end{description}
 
-{\color{red}FALTA ARMAR ESTO}
-
 \section{Constantes}
-	\aux{MIN}{}{\ent}{1}
-	\aux{MAX}{}{\ent}{10}
 
-{\color{red}??? ESTO?? QuE PONEMOS ACA?}
+% AUXILIARES USADOS 
+
+\aux{cantidadDeMinasTablero}{ t : \tablero}{\ent}{\sum_{i = 0}^{|t|-1}\sum_{j = 0}^{|t|- 1} 
+    $if (t[i][j] = \True ) then 1 else 0 $ fi}
+    
+\aux{convierteDosEnterosEnUnaPos}{x: \ent, y:\ent}{pos}{(x,y)}{}
+
+% PREDICADOS USADOS
+
+\pred{esAdyacente}{X: \pos,  P:\pos}{(\longitud{X_0-P_0}=1 \wedge (\longitud{X_1-P_1}=1  \vee x_1=p_1 ) \bigvee (X_0=P_0 \wedge \longitud{X_1-P_1}=1 )}
+
+
+\pred{juegoValido}{ t : \tablero , j : \jugadas}{}{}
+
+\pred{predPerdio}{t : \tablero, j : \jugadas}{
+   		cantidadDeMinas( t , j) = 1
+    }
+\pred{tableroValido}{t : \tablero}{
+		(\forall i : \ent)( (0 \leq i < |t|) \y (|t| = |t[0]|))\implicaLuego |t[i]| = |t[0]|
+}
 
 \section{Problemas}
+
+% RESOLUCION DE LA PARTE 1
+
 \subsection*{Parte 1: Juego Básico}
+
+
 \subsection*{Ejercicio 1}
 
-\aux{minasAdyacentes}{t:tablero, p: pos}{\ent}{\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1} \IfThenElse{esAdyacente(convierteDosEnterosEnUnaPos (i, j), p) \wedge t[i][j]}{1}{0}} 
+\aux{minasAdyacentes}{t:\tablero, p: \pos}{\ent}{\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1} \IfThenElse{esAdyacente(convierteDosEnterosEnUnaPos (i, j), p) \wedge t[i][j]}{1}{0}} 
 {\color{red} estaba mal como pasabamos la posici[on del tablero porque asi como estaba era un bool. Armé una aux que le damos la i y la j y nos arme una tupla pos, revisen si esta ok.}
 
 
-\pred{esAdyacente}{X: pos,  P:pos}{(\longitud{X_0-P_0}=1 \wedge (\longitud{X_1-P_1}=1  \vee x_1=p_1 ) \bigvee (X_0=P_0 \wedge \longitud{X_1-P_1}=1 )}
+{\color{blue} Mas o menos entendi lo que hiciste, se me hace raro que de un numero(i , j)le pasas a una tupla para que luego agarres de nuevo estos  mismos numeros que ahora estan en tupla y los compares con pos, no terminas por hacer un paso de mas?? porque valdria esto por ejemplo 
+$|i - p_{0}| = 1$}
 
-\aux{convierteDosEnterosEnUnaPos}{x: \ent, y:\ent}{pos}{(x,y)}{}
+\subsection{Ejercicio 4}
+
+\begin{proc}{perdio}{\In i: \tablero, \In j: \jugadas, \Out res: \bool}{}
+	\pre{  juegoValido(t , j) \y tableroValido(t) }
+    \post{ res : \True \leftrightarrow predPerdio(t , j)}
+\end{proc}
+
+
+
+\subsection{Ejercicio 5}
+\begin{proc}{gano}{\In i: \tablero, \In j: \jugadas, \Out res: \bool}{}
+	\pre{  juegoValido(t , j) \y tableroValido(t) \y predPerdio(t , j) }
+    \post{ res : \True \leftrightarrow predGano(t , j)}
+\end{proc}
+
+
+\subsection{Ejercicio 6}
+\begin{proc}{jugar}{\In t : \tablero , \In b : \banderitas, \In p : \pos , \Inout j : \jugadas}{}
+    \pre { tableroValido(t) \y juegoValido(t , j) \y \neg predPerdio(t , j) \y \neg predGano(t , j) \y \neg posEnJugadas(p , j) \\ \y \neg posEnBanderitas(p , b) \y j = j_{0}}
+    \post{(\forall i : \ent)(0 \leq i < |j_{0}|) \implicaLuego((j_{o}[i] \in j) \y ((\exists k : \ent)(0 \leq k < |j|) \yLuego (j[k][0]_{0} = p_{0} \y j[k][0]_{1} = p_{1} \y j[k][1] = minasAdyacentes(t , j))))}
+\end{proc}
+
+
+% FINALIZA PARTE 1 COMIENZA PARTE 2
+
+
+\subsection*{Parte 2: Despejar los vacıos}
+
+\subsection{Ejercicio 7}
+
+
+\pred{caminoLibre}{t : \tablero,p_{0} : \pos ,p_{1} : \pos}{ tableroValido(t) \y posicionValida(p_{0}) \y posicionValida(p_{1})\y ((\exists s : \TLista{\pos})((\forall i : \ent)(0 \leq i < |s|-1)\implicaLuego (minasAdyacentes(t, s[1]) = 0 \y esAdyacente(s[i] ,s[i+1])) \yLuego p_{0} = s[0] \y p_{1} = s[|s| - 1]))}
+
 
 \end{document}
