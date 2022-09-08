@@ -11,6 +11,6 @@ Espacio como recordario para el desarrollo del TPE
 
 ## Decisiones Tomadas
 
-- Un juego minimo es al menos 1 casilla 
+- Un tablero valido tiene al menos 1 casilla 
 
 ## Dudas / Preguntas
