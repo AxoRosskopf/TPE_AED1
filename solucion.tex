@@ -23,7 +23,7 @@
 \integrante{Santillan, Lautaro}{370/22}{lautisantil@gmail.com }
 \integrante{Apellidos, Sofía}{1654/21 }{sofiapotter07@gmail.com }
 \integrante{Campoverde, Axel}{258/22}{a.i.cpvd3000@gmail.com }
-\integrante{Menalled, Martín}{339/11}{martinmenalled@gmail.com}
+\integrante{Menalled, Martín}{339/22}{martinmenalled@gmail.com}
 
 \maketitle
 
@@ -42,13 +42,11 @@
 
 % AUXILIARES USADOS 
 
-\aux{cantidadDeMinasJugadas}{t:tablero, j:jugadas}{\ent}{\sum_{i=0}^{|j|-1} {\IfThenElse{(t[x(j[i])[y(j[i]) = true}{1}{0}}}
+\aux{cantidadDeMinasJugadas}{t:tablero, j:jugadas}{\ent}{\sum_{i=0}^{|j|-1} {\IfThenElse{(t[x(j[i])[y(j[i]) = true)}{1}{0}}}
 
 \aux{cantidadDeMinasTablero}{ t : \tablero}{\ent}{\sum_{i = 0}^{|t|-1}\sum_{j = 0}^{|t|- 1} 
     $if (t[i][j] = \True ) then 1 else 0 $ fi}
     
-\aux{convierteDosEnterosEnUnaPos}{x: \ent, y:\ent}{pos}{(x,y)}{}
-
 \aux{x}{jugada: pos \times \ent}{\ent}{(jugada_0)_0}{}
 
 \aux{y}{jugada: pos \times \ent}{\ent}{(jugada_0)_1}{}
@@ -58,7 +56,7 @@
 
 \pred{esAdyacente}{X: \pos,  P:\pos}{(\longitud{X_0-P_0}=1 \wedge (\longitud{X_1-P_1}=1  \vee X_1=P_1 ) \bigvee (X_0=P_0 \wedge \longitud{X_1-P_1}=1 )}
 
-\pred{posicionEsValida}{t: tablero, p: pos}{p_0 \leq \longitud{t} \y p_1 \leq \longitud{t}}{}
+\pred{posicionEsValida}{t: tablero, p: pos}{0\leq p_0 < \longitud{t} \y 0\leq p_1 < \longitud{t}}{}
 
 \pred{repiteJugada}{j:jugadas}{	(\forall i : \ent)( (0 \leq i < |j|) \implicaLuego (\exists k: \ent) ((0 \leq k \leq |j|)
     \y (i\neq k)) \yLuego (x(j[i]) = x(j[k]) \y y(j[i]) = y(j[k]))}{}
@@ -66,13 +64,27 @@
 \pred{predPerdio}{t : \tablero, j : \jugadas}{
    		cantidadDeMinas( t , j) = 1
     }
+
+\pred{predGano}{t : \tablero, j : \jugadas}{
+   		|t|*|t|-cantidadDeMinasTablero(t)=|j|
+    }
+    
 \pred{tableroValido}{t : \tablero}{
-		(\forall i : \ent)( (0 \leq i < |t|) \y (|t| = |t[0]|))\implicaLuego |t[i]| = |t[0]|
+		(\forall i : \ent)(( (0 \leq i < |t|) \y (|t| = |t[0]|))\implicaLuego |t[i]| = |t[0]|)
 }
 
-\pred{posEnJugadas}{p: \pos, j:\jugadas}{(\exists i: \ent) (0\leq i \leq \longitud{j}) \yLuego (j[i]_0)=p}{}
+\pred{posEnJugadas}{p: \pos, j:\jugadas}{(\exists i: \ent) ((0\leq i < \longitud{j}) \yLuego (x(j[i])=p_0 \wedge y(j[i])=p_1)) }{}
 
-\pred{posEnBanderitas}{p: \pos, b:\banderitas}{(\exists i: \ent) (0\leq i \leq \longitud{b}) \yLuego (b[i])=p}{}
+\pred{posEstaEnJugadas}{t:\tablero, p: \pos, j:\jugadas}{(\exists i: \ent) ((0\leq i < \longitud{j}) \yLuego (x(j[i])=p_0 \wedge y(j[i])=p_1) \wedge minasAdyacentes (t,p)=J[i]_1) }{}
+
+
+\pred{posEnBanderitas}{p: \pos, b:\banderitas}{(\exists i: \ent) ((0\leq i < \longitud{b}) \yLuego ((b[i])_0=p_0 \wedge (b[i])_1=p_1))}{}
+
+\pred{caminoLibrePlus}{t : \tablero,p0 : \pos ,p1 : \pos}
+{ tableroValido(t) \y posicionValida(p_{0}) \y posicionValida(p_{1})\y \\
+((\exists s : \TLista{\pos}) \\ 
+((\forall i : \ent)(0 \leq i < |s|-1\implicaLuego (minasAdyacentes(t, s[i]) = 0 \y esAdyacente(s[i] ,s[i+1])) \\
+\yLuego p0 = s[0] \y p1 = s[|s| - 1])}
 
 \section{Problemas}
 
@@ -83,23 +95,17 @@
 
 \subsection*{Ejercicio 1}
 
-\aux{minasAdyacentes}{t:\tablero, p: \pos}{\ent}{\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1} \IfThenElse{esAdyacente(convierteDosEnterosEnUnaPos (i, j), p) \wedge t[i][j]=true}{1}{0}} 
-{\color{red} estaba mal como pasabamos la posici[on del tablero porque asi como estaba era un bool. Armé una aux que le damos la i y la j y nos arme una tupla pos, revisen si esta ok.}
+\aux{minasAdyacentes}{t:\tablero, p: \pos}{\ent}{\sum_{i=0}^{\longitud{t}-1}\sum_{j=0}^{\longitud{t}-1} \IfThenElse{esAdyacente((i, j), p) \wedge t[i][j]=true)}{1}{0}} 
 
-
-{\color{blue} Mas o menos entendi lo que hiciste, se me hace raro que de un numero(i , j)le pasas a una tupla para que luego agarres de nuevo estos  mismos numeros que ahora estan en tupla y los compares con pos, no terminas por hacer un paso de mas?? porque valdria esto por ejemplo 
-$|i - p_{0}| = 1$}
-
-{\color{red} Si, lo pensé igual que vos en un primer momento y lo había hecho así pero luego miré que más adelante usamos la misma auxiliar y le pasamos dos posiciones, entonces o había que hacer esto o hacer dos  "esAdyacente" y que una reciba dos posiciones y la otra reciba dos enteros y una posicion. Se me hizo que esta tal vez la reutilicemos}
 
 \subsection*{Ejercicio 2}
 \pred{juegoValido}{t: tablero, j: jugadas}{(\forall i : \ent)( (0 \leq i < |j|) $\implicaLuego$ (posicionEsValida(j[i]_0) \bigwedge ($j[i]_1$ = minasAdyacentes (t, j[i]_0)) \bigwedge  $\neg$ repiteJugada(j) \bigwedge \\($0\leq cantidadDeMinas(t, j) \leq 1)$)} {}
 
 \subsection*{Ejercicio 3}
 
-\begin{proc}{plantarBanderita}{in n:\ent, in j:\jugadas, in p: \pos, inout b: \banderitas}{}
-    \pre{n \geq 1 \wedge posicionEsValida (p) \wedge \neg(posEnJugadas(p, j) \wedge \neg (posEnBanderitas (p,b)) \wedge b=b_0}
-    \post{pos \in b \wedge (\forall i:\ent)(0\leq i \leq \longitud{b_0}) \implicaLuego b_0[i] \in b}
+\begin{proc}{plantarBanderita}{in t:\tablero, in j:\jugadas, in p: \pos, inout b: \banderitas}{}
+    \pre{tableroValido(t) \wedge posicionEsValida (p) \wedge \neg(posEnJugadas(p, j) \wedge \neg (posEnBanderitas (p,b)) \wedge b=b_0}
+    \post{pos \in b \wedge (\forall i:\ent)(0\leq i < \longitud{b_0}) \implicaLuego b_0[i] \in b}
 \end{proc}
 
 \subsection*{Ejercicio 4}
@@ -113,7 +119,7 @@ $|i - p_{0}| = 1$}
 
 \subsection*{Ejercicio 5}
 \begin{proc}{gano}{\In i: \tablero, \In j: \jugadas, \Out res: \bool}{}
-	\pre{  juegoValido(t , j) \y tableroValido(t) \y predPerdio(t , j) }
+	\pre{  juegoValido(t , j) \y tableroValido(t) \y \neg (predPerdio(t , j)) }
     \post{ res : \True \leftrightarrow predGano(t , j)}
 \end{proc}
 
@@ -121,10 +127,9 @@ $|i - p_{0}| = 1$}
 \subsection*{Ejercicio 6}
 \begin{proc}{jugar}{\In t : \tablero , \In b : \banderitas, \In p : \pos , \Inout j : \jugadas}{}
     \pre { tableroValido(t) \y juegoValido(t , j) \y \neg predPerdio(t , j) \y \neg predGano(t , j) \y \neg posEnJugadas(p , j) \\ \y \neg posEnBanderitas(p , b) \y j = j_{0}}
-    \post{(\forall i : \ent)(0 \leq i < |j_{0}|) \implicaLuego((j_{o}[i] \in j) \y ((\exists k : \ent)(0 \leq k < |j|) \yLuego (j[k][0]_{0} = p_{0} \y j[k][0]_{1} = p_{1} \y j[k][1] = minasAdyacentes(t , j))))}
+    \post{(\forall i : \ent)((0 \leq i < |j_{0}|) \implicaLuego(j_{o}[i] \in j \y ((\exists k : \ent)(0 \leq k < |j| \yLuego (x(j[k]) = p_{0} \y y(j[k]) = p_{1} \y j[k][1] = minasAdyacentes(t , j))))}
 \end{proc}
 
-{\color{red} Aca en la post estamos poniendo p1 y p0 pero no veo de donde sale. Revisemos}
 
 
 % FINALIZA PARTE 1 COMIENZA PARTE 2
@@ -135,7 +140,34 @@ $|i - p_{0}| = 1$}
 \subsection*{Ejercicio 7}
 
 
-\pred{caminoLibre}{t : \tablero,p_{0} : \pos ,p_{1} : \pos}{ tableroValido(t) \y posicionValida(p_{0}) \y posicionValida(p_{1})\y ((\exists s : \TLista{\pos})((\forall i : \ent)(0 \leq i < |s|-1)\implicaLuego (minasAdyacentes(t, s[1]) = 0 \y esAdyacente(s[i] ,s[i+1])) \yLuego p_{0} = s[0] \y p_{1} = s[|s| - 1]))}
+\pred{caminoLibre}{t : \tablero,p0 : \pos ,p1 : \pos}
+{ tableroValido(t) \y posicionValida(p_{0}) \y posicionValida(p_{1})\y \\
+((\exists s : \TLista{\pos}) \\ 
+((\forall i : \ent)(0 \leq i < |s|-1\implicaLuego (minasAdyacentes(t, s[i]) = 0 \y esAdyacente(s[i] ,s[i+1])) \\
+\yLuego p0 = s[0] \y p1 = s[|s| - 1] \y minasAdyacentes(t,p1)>=1))}
+
+\subsection*{Ejercicio 8}
+
+#Consideramos para este ejercicio que se deben descubrir todas las casilla con camino libre a p. Tengan estas minas adyacentes o no.
+Para eso armamos un predicado caminolibrePlus.
+
+\begin{proc}{jugarPlus}{in t:\tablero, in b: \banderitas, in p:\pos, inout j: \jugadas}{}
+    \pre{tableroValido(t) \y juegoValido(t , j) \y \neg predPerdio(t , j) \y \neg predGano(t , j) \y \neg posEnJugadas(p , j) \\ \y \neg posEnBanderitas(p , b) \y j = j_{0}}
+    \post{(\forall i : \ent)((0 \leq i < |j_{0}|) \implicaLuego(j_{o}[i] \in j) \\
+    \y posEstaEnJugadas (t, p, j)
+    \y  \\   ((\forall r: \pos) ((pos \in t \yLuego caminoLibrePlus (t,p,r)) \Then posEstaEnJugadas(t, r, j))
+    }    
+
+\end{proc}
+
+\begin{proc}{jugarPlus}{in t:\tablero, in b: \banderitas, in p:\pos, inout j: \jugadas}{}
+    \pre{tableroValido(t) \y juegoValido(t , j) \y \neg predPerdio(t , j) \y \neg predGano(t , j) \y \neg posEnJugadas(p , j) \\ \y \neg posEnBanderitas(p , b) \y j = j_{0}}
+    \post{(\forall i : \ent)((0 \leq i < |j_{0}|) \implicaLuego(j_{o}[i] \in j) \\
+    \y ((\exists k : \ent)(0 \leq k < |j| \yLuego (x(j[k]) = p_{0} \y y(j[k]) = p_{1} \y j[k][1] = minasAdyacentes(t , j))))
+    \y  \\   ((\forall r: \pos) ((pos \in t \yLuego caminoLibrePlus (t,p,r)) \Then ((\exists k: \ent)((0\leq k <|j|) \yLuego (x(j[k]_0)=r_0 \y  y(j[k]_0)=r_1 \y j[k]_1=minasAdyacentes (t,r))))))
+    }    
+
+\end{proc}
 
 
 \end{document}
