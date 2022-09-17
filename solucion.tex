@@ -86,6 +86,16 @@
 ((\forall i : \ent)(0 \leq i < |s|-1\implicaLuego (minasAdyacentes(t, s[i]) = 0 \y esAdyacente(s[i] ,s[i+1])) \\
 \yLuego p0 = s[0] \y p1 = s[|s| - 1])}
 
+\pred{enMismaFila}{p : \pos , j : \jugadas , n : \ent}{
+    (p_{1} = j[n]_{0}_{1} + 1 \vee  p_{1} = j[n]_{0}_{1} - 1) \y   p_{0} = j[n]_{0}_{0}
+}
+
+\pred{enMismaColumna}{p : \pos , j : \jugadas , n : \ent}{
+    (p_{0} = j[n]_{0}_{0} + 1 \vee  p_{0} = j[n]_{0}_{0} - 1) \y   p_{1} = j[n]_{0}_{1}
+}{}
+
+
+
 \section{Problemas}
 
 % RESOLUCION DE LA PARTE 1
@@ -148,8 +158,7 @@
 
 \subsection*{Ejercicio 8}
 
-#Consideramos para este ejercicio que se deben descubrir todas las casilla con camino libre a p. Tengan estas minas adyacentes o no.
-Para eso armamos un predicado caminolibrePlus.
+%Consideramos para este ejercicio que se deben descubrir todas las casilla con camino libre a p. Tengan estas minas adyacentes o no. Para eso armamos un predicado caminolibrePlus.
 
 \begin{proc}{jugarPlus}{in t:\tablero, in b: \banderitas, in p:\pos, inout j: \jugadas}{}
     \pre{tableroValido(t) \y juegoValido(t , j) \y \neg predPerdio(t , j) \y \neg predGano(t , j) \y \neg posEnJugadas(p , j) \\ \y \neg posEnBanderitas(p , b) \y j = j_{0}}
@@ -167,6 +176,13 @@ Para eso armamos un predicado caminolibrePlus.
     \y  \\   ((\forall r: \pos) ((pos \in t \yLuego caminoLibrePlus (t,p,r)) \Then ((\exists k: \ent)((0\leq k <|j|) \yLuego (x(j[k]_0)=r_0 \y  y(j[k]_0)=r_1 \y j[k]_1=minasAdyacentes (t,r))))))
     }    
 
+\end{proc}
+
+
+\subsection{Ejercicio 9}
+\begin{proc}{sugerirAutomatico}{\In j : \jugadas, \In t : \tablero , \In b : \banderitas, \Out p : \pos}{}
+    \pre { (\exists m, n, k : \ent )( 0 \leq m, n, k < |j| \y m \neq n \neq k) \yLuego (((j[m]_{0}_{0} = j[n]_{0}_{0} = j[k]_{0}_{0}) \y (j[m]_{0}_{1} = j[n]_{0}_{1} - 1 = j[k]_{0}_{1} - 2)) \vee ((j[m]_{0}_{1} = j[n]_{0}_{1} = j[k]_{0}_{1}) \y (j[m]_{0}_{0} = j[n]_{0}_{0} - 1 = j[k]_{0}_{0} - 2))) \y (j[m]_{1} = 1 \y j[k]_{1} = 1 \y j[n]_{1} = 2)  }
+    \post{(\forall i : \ent)(0 \leq i < |j|) \implicaLuego( p \notin b \y p \neq j[i]_{0} \y 0 \leq p_{0}, p_{1} < |t| \y ((enMismaFila(p, j ,n ))  \vee  (enMismaColumna(p, j,n )) ))}
 \end{proc}
 
 
