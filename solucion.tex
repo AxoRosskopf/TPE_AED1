@@ -119,6 +119,13 @@
   \vee  (enMismaColumna (j[m], j[n]) \y enMismaColumna(j[n], j[k]) \y 
   filaAdyacente(j[m], j[n]) \y filaAdyacente (j[n], j[k]) \y (j[m]_{1} = 1 \y j[k]_{1} = 1 \y j[n]_{1} = 2) }
 
+\pred{dosMinasEnPatron121}{j : \jugadas,n : \ent}{
+   (\forall m, k : \ent )( 0 \leq m, k < |j| \y m \neq k) \yLuego \\
+(enMismaFila(j[m], j[n]) \y enMismaFila(j[n], j[k])
+ \y (columnaAdyacente(j[m], j[n]) \y columnaAdyacente (j[n], j[k]))
+  \vee  (enMismaColumna (j[m], j[n]) \y enMismaColumna(j[n], j[k]) \y 
+  filaAdyacente(j[m], j[n]) \y filaAdyacente (j[n], j[k]) \y (j[m]_{1} = 1 \y j[k]_{1} = 1 \y j[n]_{1} = 2)
+}{}
 
 \section{Problemas}
 
@@ -198,6 +205,7 @@
     \pre {tableroValido (t) \y juegoValido (t, j) \y  existePatron121(j)}
     \post{\neg (posEnBanderitas(p , b)) \y 
     \neg(posEnJugadas(pos,j)) \y posicionValida (t, p) \y \\
+    (\exists n : \ent)(0 \leq n , |j|)\yLuego(j[n]_1=2 \y dosMinasEnPatron121(j,n))\y
     ((\forall i : \ent)((0 \leq i < |j|) \implicaLuego(((tresEnMismaFila(p, j ,n ))  \vee  (tresEnMismaColumna(p, j,n )) )) ))}
 \end{proc}
 
