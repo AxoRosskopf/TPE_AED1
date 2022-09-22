@@ -70,14 +70,6 @@
 \pred{columnaAdyacente}{p : \pos , q : \pos}{\longitud{q_1-p_1}=1}{}
 
 
-\pred{tresEnMismaFila}{p : \pos , j : \jugadas , n : \ent}{
-    (p_{1} = y(j[n]) + 1 \vee  p_{1} = y(j[n]) - 1) \y   p_{0} = x(j[n])
-}
-
-\pred{tresEnMismaColumna}{p : \pos , j : \jugadas , n : \ent}{
-    (p_{0} = x(j[n]) + 1 \vee  p_{0} = x(j[n]) - 1) \y   p_{1} = y(j[n])
-}
-
 
 \pred{posicionEsValida}{t: tablero, p: pos}{0\leq p_0 < \longitud{t} \y 0\leq p_1 < \longitud{t}}{}
 
@@ -112,7 +104,7 @@
 \pred{jugadasAnterioresGuardadas}{j: \jugadas, k: \jugadas}{
 (\forall i : \ent)((0 \leq i < |k|) \implicaLuego(k[i]) \in j))}
 
-\pred{existePatro121}{j: \jugadas}{
+\pred{existePatron121}{j: \jugadas}{
 (\exists m, n, k : \ent )( 0 \leq m, n, k < |j| \y m \neq n \neq k) \yLuego \\
 (enMismaFila(j[m], j[n]) \y enMismaFila(j[n], j[k])
  \y (columnaAdyacente(j[m], j[n]) \y columnaAdyacente (j[n], j[k]))
@@ -121,11 +113,20 @@
 
 \pred{dosMinasEnPatron121}{j : \jugadas,n : \ent}{
    (\exists m, k : \ent )( 0 \leq m, k < |j| \y m \neq k) \yLuego \\
-(enMismaFila(j[m], j[n]) \y enMismaFila(j[n], j[k])
- \y (columnaAdyacente(j[m], j[n]) \y columnaAdyacente (j[n], j[k]))
-  \vee  (enMismaColumna (j[m], j[n]) \y enMismaColumna(j[n], j[k]) \y 
-  filaAdyacente(j[m], j[n]) \y filaAdyacente (j[n], j[k]) \y (j[m]_{1} = 1 \y j[k]_{1} = 1 \y j[n]_{1} = 2)
-}{}
+((enMismaFila(j[m], j[n]) \y enMismaFila(j[n], j[k])
+ \y (columnaAdyacente(j[m], j[n]) \y columnaAdyacente (j[n], j[k])))
+  \vee  ((enMismaColumna (j[m], j[n]) \y enMismaColumna(j[n], j[k])) \y 
+  (filaAdyacente(j[m], j[n]) \y filaAdyacente (j[n], j[k]))) \y  (j[m]_{1} = 1 \y j[k]_{1} = 1 \y j[n]_{1} = 2)
+}
+
+\pred{tresEnMismaFila}{p : \pos , j : \jugadas , n : \ent}{
+    (p_{1} = y(j[n]) + 1 \vee  p_{1} = y(j[n]) - 1) \y   p_{0} = x(j[n])
+}
+
+\pred{tresEnMismaColumna}{p : \pos , j : \jugadas , n : \ent}{
+    (p_{0} = x(j[n]) + 1 \vee  p_{0} = x(j[n]) - 1) \y   p_{1} = y(j[n])
+}
+
 
 \section{Problemas}
 
@@ -205,11 +206,8 @@
     \pre {tableroValido (t) \y juegoValido (t, j) \y  existePatron121(j)}
     \post{\neg (posEnBanderitas(p , b)) \y 
     \neg(posEnJugadas(pos,j)) \y posicionValida (t, p) \y \\
-    (\exists n : \ent)(0 \leq n , |j|)\yLuego( dosMinasEnPatron121(j,n))\y
-    ((\forall i : \ent)((0 \leq i < |j|) \implicaLuego(((tresEnMismaFila(p, j ,n ))  \vee  (tresEnMismaColumna(p, j,n )) )) ))}
+    (\exists n : \ent)(0 \leq n < |j| \yLuego dosMinasEnPatron121(j,n)\y
+    (tresEnMismaFila(p, j ,n )  \vee  tresEnMismaColumna(p, j,n ))) }
 \end{proc}
-
-/*Dejo esto acá para no borrar lo de Axel por las dudas */
-(\forall i : \ent)(0 \leq i < |j|) \implicaLuego( p \neq j[i]_{0} \y 0 \leq p_{0}, p_{1} < |t| \y ((tresEnMismaFila(p, j ,n ))  \vee  (tresEnMismaColumna(p, j,n )) )
 
 \end{document}
