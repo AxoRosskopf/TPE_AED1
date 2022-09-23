@@ -23,6 +23,7 @@
 \integrante{Santillan, Lautaro}{370/22}{lautisantil@gmail.com }
 \integrante{Campoverde, Axel}{258/22}{a.i.cpvd3000@gmail.com }
 \integrante{Menalled, Martín}{339/22}{martinmenalled@gmail.com}
+\integrante{Dejó la materia por enfermedad}{1654/21}{sofiapotter07@gmail.com }
 
 \maketitle
 
@@ -73,8 +74,8 @@
 
 \pred{posicionEsValida}{t: tablero, p: pos}{0\leq p_0 < \longitud{t} \y 0\leq p_1 < \longitud{t}}{}
 
-\pred{repiteJugada}{j:jugadas}{	(\forall i : \ent)( (0 \leq i < |j|) \implicaLuego (\exists k: \ent) ((0 \leq k \leq |j|)
-    \y (i\neq k)) \yLuego (x(j[i]) = x(j[k]) \y y(j[i]) = y(j[k]))}{}
+\pred{repiteJugada}{j:jugadas}{	(\forall i : \ent)( (0 \leq i < |j|) \implicaLuego (\exists k: \ent) ((0 \leq k \leq |j|
+    \y i\neq k) \yLuego (x(j[i]) = x(j[k]) \y y(j[i]) = y(j[k]))))}{}
 
 \pred{predPerdio}{t : \tablero, j : \jugadas}{
    		cantidadDeMinasEnJugadas( t , j) = 1
@@ -84,13 +85,14 @@
    		|t|*|t|-cantidadDeMinasTablero(t)=|j|
     }
     
+/* Aunque no tenga mucha gracia el juego, consideramos que desde la lógica el tablero puede tener el tamaño 1 x 1*/
 \pred{tableroValido}{t : \tablero}{
 		(\forall i : \ent)(( (0 \leq i < |t|))\implicaLuego (|t[i]| = |t|)
 }
 
 \pred{posEnJugadas}{p: \pos, j:\jugadas}{(\exists i: \ent) ((0\leq i < \longitud{j}) \yLuego (x(j[i])=p_0 \wedge y(j[i])=p_1)) }{}
 
-\pred{guardarPosYMinasEnJugadas}{t:\tablero, p: \pos, j:\jugadas}{(\exists i: \ent) ((0\leq i < \longitud{j}) \yLuego (x(j[i])=p_0 \wedge y(j[i])=p_1) \wedge minasAdyacentes (t,p)=j[i]_1) }{}
+\pred{chequeaNuevaPosYMinasEnJugadas}{t:\tablero, p: \pos, j:\jugadas}{(\exists i: \ent) ((0\leq i < \longitud{j}) \yLuego (x(j[i])=p_0 \wedge y(j[i])=p_1) \wedge minasAdyacentes (t,p)=j[i]_1) }{}
 
 
 \pred{posEnBanderitas}{p: \pos, b:\banderitas}{(\exists i: \ent) ((0\leq i < \longitud{b}) \yLuego ((b[i])_0=p_0 \wedge (b[i])_1=p_1))}{}
@@ -115,7 +117,7 @@
    (\exists m, k : \ent )( 0 \leq m, k < |j| \y m \neq k) \yLuego \\
 ((enMismaFila(j[m], j[n]) \y enMismaFila(j[n], j[k])
  \y (columnaAdyacente(j[m], j[n]) \y columnaAdyacente (j[n], j[k])))
-  \vee  ((enMismaColumna (j[m], j[n]) \y enMismaColumna(j[n], j[k])) \y 
+  \vee  ((enMismaColumna (j[m], j[n]) \y enMismaColumna(j[n], j[k])) \y \\
   (filaAdyacente(j[m], j[n]) \y filaAdyacente (j[n], j[k]))) \y  (j[m]_{1} = 1 \y j[k]_{1} = 1 \y j[n]_{1} = 2)
 }
 
@@ -127,9 +129,10 @@
     (p_{0} = x(j[n]) + 1 \vee  p_{0} = x(j[n]) - 1) \y   p_{1} = y(j[n])
 }
 
-\pred{BanderitasValidas}{b : \banderitas, t:\tablero, j : \jugadas}{
-    (\forall i : \ent)(0 \leq i < |b|)\implicaLuego ((\forall k :\ent)(0 \leq k < |j|)\implicaLuego(b[i] \neq j[k]_{0} \y ((0 \leq b[i]_{0} < |t|)\y(0 \leq b[i]_{1} < |t|))))
-}
+\pred{banderitasValidas}{b : \banderitas, t:\tablero, j : \jugadas}{
+    (\forall i : \ent)(0 \leq i < |b|\implicaLuego (\neg(posEnJugadas(b[i], j)) \y posicionEsValida(t, b[i])) \y \\
+    \neg(\exists j: \ent) (0 \leq j < \longitud{b} \wedge i\neq j \yLuego b[i]=b[j]))
+    }
 
 
 \section{Problemas}
@@ -151,8 +154,8 @@
 \subsection*{Ejercicio 3}
 
 \begin{proc}{plantarBanderita}{in t:\tablero, in j:\jugadas, in p: \pos, inout b: \banderitas}{}
-    \pre{tableroValido(t) \wedge posicionEsValida (t,p) \wedge \neg(posEnJugadas(p, j) \wedge \neg (posEnBanderitas (p,b)) \wedge b=b_0}
-    \post{posEnBanderitas(p, b) \wedge (\forall i:\ent)(0\leq i < \longitud{b_0}) \implicaLuego posEnBanderitas(b_0[i],b)}
+    \pre{tableroValido(t) \wedge posicionEsValida (t,p) \wedge \neg(posEnJugadas(p, j) \wedge \neg (posEnBanderitas (p,b)) \wedge b=b_0 \wedge banderitasValidas (b)}
+    \post{banderitasValidas(b) \wedge \longitud{b}=\longitud{b_0}+1 \wedge posEnBanderitas(p, b) \wedge \\ (\forall i:\ent)(0\leq i < \longitud{b_0} \implicaLuego posEnBanderitas(b_0[i],b))}
 \end{proc}
 
 \subsection*{Ejercicio 4}
@@ -173,8 +176,8 @@
 
 \subsection*{Ejercicio 6}
 \begin{proc}{jugar}{\In t : \tablero , \In b : \banderitas, \In p : \pos , \Inout j : \jugadas}{}
-    \pre { tableroValido(t) \y juegoValido(t , j) \y \neg (predPerdio(t , j)) \y \neg (predGano(t , j)) \y \neg (posEnJugadas(p , j)) \\ \y \neg (posEnBanderitas(p , b)) \y j = j0}
-    \post{jugadasAnterioresGuardadas(j, j0) \y guardarPosYMinasEnJugadas(t, p, j)}
+    \pre { tableroValido(t) \y juegoValido(t , j) \y \neg (predPerdio(t , j)) \y \neg (predGano(t , j)) \y \neg (posEnJugadas(p , j)) \\ \y \neg (posEnBanderitas(p , b)) \y banderitasValidas(b) \y j = j0}
+    \post{\longitud{j}=\longitud{j0}+1 \wedge jugadasAnterioresGuardadas(j, j0) \y chequeaNuevaPosYMinasEnJugadas(t, p, j)}
 \end{proc}
 
 
@@ -188,7 +191,7 @@
 
 
 \pred{caminoLibre}{t : \tablero,p0 : \pos ,p1 : \pos}
-{ tableroValido(t) \y posicionValida(t , p_{0}) \y posicionValida(t, p_{1})\y \\
+{ tableroValido(t) \y posicionValida(t , p0) \y posicionValida(t, p1)\y \\
 ((\exists s : \TLista{\pos}) \\
 \longitud{s} > 1 \yLuego (p0 = s[0] \y p1 = s[|s| - 1] \y minasAdyacentes(t,p0)=0 \y minasAdyacentes(t,p1)>=1) \y \\
 ((\forall i : \ent)(1 \leq i < |s|-1\implicaLuego (minasAdyacentes(t, s[i]) = 0 \y esAdyacente(s[i] ,s[i+1]))))}
@@ -198,12 +201,14 @@
 /*Consideramos para este ejercicio que se deben descubrir todas las casilla con camino libre a p. Tengan estas minas adyacentes o no. Para eso armamos un predicado caminolibrePlus.*/
 
 \begin{proc}{jugarPlus}{in t:\tablero, in b: \banderitas, in p:\pos, inout j: \jugadas}{}
-    \pre{tableroValido(t) \y juegoValido(t , j) \y \neg (predPerdio(t , j)) \y \neg (predGano(t , j)) \y \neg (posEnJugadas(p , j)) \\ \y \neg (posEnBanderitas(p , b)) \y j = j0}
-    \post{jugadasAnterioresGuardadas(j, j0) \y guardarPosYMinasEnJugadas(t, p, j)
-    \y  \\   ((\forall r: \pos) ((posicionValida(t, r) \y caminoLibrePlus (t,p,r) \y \neg(posEnJugadas(r,j0)) \y \neg (posEnBanderitas(r , b)) \Then \\ guardarPosYMinasEnJugadas(t, r, j))
+    \pre{tableroValido(t) \y juegoValido(t , j) \y banderitasValidas(b) \y \\ \neg (predPerdio(t , j)) \y \neg (predGano(t , j)) \y \neg (posEnJugadas(p , j)) \\ \y \neg (posEnBanderitas(p , b)) \y j = j0}
+    \post{jugadasAnterioresGuardadas(j, j0) \y chequeaNuevaPosYMinasEnJugadas(t, p, j)
+    \y  \\   ((\forall r: \pos) ((posicionValida(t, r) \y caminoLibrePlus (t,p,r) \y \neg(posEnJugadas(r,j0)) \y \neg (posEnBanderitas(r , b)) \Then \\ chequeaNuevaPosYMinasEnJugadas(t, r, j))
     }    
 
 \end{proc}
+
+\subsection*{Parte 3: Jugador Automático}
 
 \subsection*{Ejercicio 9}
 \begin{proc}{sugerirAutomatico}{\In j : \jugadas, \In t : \tablero , \In b : \banderitas, \Out p : \pos}{}
