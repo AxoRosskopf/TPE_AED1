@@ -127,6 +127,10 @@
     (p_{0} = x(j[n]) + 1 \vee  p_{0} = x(j[n]) - 1) \y   p_{1} = y(j[n])
 }
 
+\pred{BanderitasValidas}{b : \banderitas, t:\tablero, j : \jugadas}{
+    (\forall i : \ent)(0 \leq i < |b|)\implicaLuego ((\forall k :\ent)(0 \leq k < |j|)\implicaLuego(b[i] \neq j[k]_{0} \y ((0 \leq b[i]_{0} < |t|)\y(0 \leq b[i]_{1} < |t|))))
+}
+
 
 \section{Problemas}
 
@@ -203,7 +207,9 @@
 
 \subsection*{Ejercicio 9}
 \begin{proc}{sugerirAutomatico}{\In j : \jugadas, \In t : \tablero , \In b : \banderitas, \Out p : \pos}{}
-    \pre {tableroValido (t) \y juegoValido (t, j) \y  existePatron121(j)}
+    \pre {tableroValido (t) \y juegoValido (t, j) \y  existePatron121(j) \y \neg (predPerdio(t , j)) \y \neg (predGano(t , j))\\
+    \y BanderitasValidas(b, t, j)
+    }
     \post{\neg (posEnBanderitas(p , b)) \y 
     \neg(posEnJugadas(pos,j)) \y posicionValida (t, p) \y \\
     (\exists n : \ent)(0 \leq n < |j| \yLuego dosMinasEnPatron121(j,n)\y
